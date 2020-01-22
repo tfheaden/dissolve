@@ -71,6 +71,28 @@ class NETARingNode : public NETANode
 
 
 	/*
+	 * Flags
+	 */
+	private:
+	// Whether there should be no rings at all
+	bool noRings_;
+
+	public:
+	// Available flags
+	enum NETARingFlag
+	{
+		NoRingsFlag,			/* 'none' - Specifies that there should be no rings at all */
+		nRingFlags
+	};
+	// Return enum options for NETAConnectionFlags
+	static EnumOptions<NETARingNode::NETARingFlag> flags();
+	// Return whether the specified flag is valid for this node
+	bool isValidFlag(const char* s) const;
+	// Set specified flag
+	bool setFlag(const char* flag, bool state);
+
+
+	/*
 	 * Scoring
 	 */
 	private:

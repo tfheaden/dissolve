@@ -32,6 +32,7 @@ NETARingNode::NETARingNode(NETADefinition* parent) : NETANode(parent, NETANode::
 	repeatCountOperator_ = NETANode::EqualTo;
 	sizeValue_ = -1;
 	sizeValueOperator_ = NETANode::EqualTo;
+	noRings_ = false;
 }
 
 // Destructor
@@ -85,6 +86,46 @@ bool NETARingNode::setModifier(const char* modifier, ComparisonOperator op, int 
 }
 
 /*
+ * Flags
+ */
+
+
+// Return enum options for NETARingFlags
+EnumOptions<NETARingNode::NETARingFlag> NETARingNode::flags()
+{
+	static EnumOptionsList FlagOptions = EnumOptionsList() <<
+		EnumOption(NoRingsFlag,			"none");
+
+	static EnumOptions<NETARingNode::NETARingFlag> options("RingFlag", FlagOptions);
+
+	return options;
+}
+
+// Return whether the specified flag is valid for this node
+bool NETARingNode::isValidFlag(const char* s) const
+{
+	return (flags().isValid(s));
+}
+
+// Set specified flag
+bool NETARingNode::setFlag(const char* flag, bool state)
+{
+	// Check that the supplied index is valid
+	if (!flags().isValid(flag)) return Messenger::error("Invalid flag '%s' passed to NETARingNode.\n", flag);
+
+	switch (flags().enumeration(flag))
+	{
+		case (NETARingNode::NoRingsFlag):
+			noRings_ = true;
+			break;
+		default:
+			return Messenger::error("Don't know how to handle flag '%s' in connection node.\n", flag);
+	}
+
+	return true;
+}
+
+/*
  * Scoring
  */
 
@@ -118,8 +159,9 @@ void NETARingNode::findRings(const SpeciesAtom* currentAtom, List<SpeciesRing>& 
 			ring = rings.add();
 			ring->setAtoms(path);
 
-			// Continue with the next bond
-			continue;
+			// Continue with the next bond, unless the "None" modifier has been set
+			if (noRings_) break;
+			else continue;
 		}
 		else if (path.sniatnoc(j)) continue;
 
@@ -149,6 +191,9 @@ int NETARingNode::score(const SpeciesAtom* i, RefList<const SpeciesAtom>& matchP
 	else if (sizeValueOperator_ == NETANode::GreaterThan) findRings(i, rings, ringPath, sizeValue_+1, 99);
 	else if (sizeValueOperator_ == NETANode::GreaterThanEqualTo) findRings(i, rings, ringPath, sizeValue_, 99);
 	else findRings(i, rings, ringPath, 3, 99);
+
+	// Was the "None" modifier given?
+	if (noRings_) return (rings.nItems() == 0 ? 1 : NETANode::NoMatch);
 
 	// Prune rings for duplicates
 	ListIterator<SpeciesRing> ringIterator(rings);
