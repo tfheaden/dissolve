@@ -14,6 +14,7 @@
 #include "data/ff/oplsaa2005/diols.h"
 #include "data/ff/oplsaa2005/noblegases.h"
 #include "data/ff/oplsaa2005/triols.h"
+#include "data/ff/oplsaa2005/ethers.h"
 #include "data/ff/pcl2019/anions.h"
 #include "data/ff/pcl2019/cations.h"
 #include "data/ff/spcfw/spcfw.h"
@@ -57,6 +58,7 @@ void ForcefieldLibrary::registerForcefields()
     registerForcefield(std::make_shared<Forcefield_OPLSAA2005_Diols>());
     registerForcefield(std::make_shared<Forcefield_OPLSAA2005_NobleGases>());
     registerForcefield(std::make_shared<Forcefield_OPLSAA2005_Triols>());
+    registerForcefield(std::make_shared<Forcefield_OPLSAA2005_Ethers>());
     registerForcefield(std::make_shared<Forcefield_PCL2019_Anions>());
     registerForcefield(std::make_shared<Forcefield_PCL2019_Cations>());
     registerForcefield(std::make_shared<Forcefield_SPCFw>());
